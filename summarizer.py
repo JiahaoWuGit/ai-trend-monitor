@@ -10,13 +10,14 @@ from openai import OpenAI
 #   qwen-turbo   — 最便宜，速度最快
 #   qwen-max     — 最强，复杂推理（$1.60/M input, $6.40/M output）
 #   qwen3.5-plus — 最新版，能力更强
-MODEL = "qwen-plus"
+MODEL = "kimi-k2.5"
 MAX_TOKENS = 4000
 
 # DashScope API 地址
 #   国内：https://dashscope.aliyuncs.com/compatible-mode/v1
 #   海外：https://dashscope-intl.aliyuncs.com/compatible-mode/v1
-BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1"
+BASE_URL = "https://coding.dashscope.aliyuncs.com/v1"
+
 
 
 def summarize(research_items: list, commercial_items: list) -> dict:
