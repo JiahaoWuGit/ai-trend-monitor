@@ -55,11 +55,20 @@ def run(fetch_only=False, local_only=False):
     print("\n  ── Commercial ──")
     commercial_items.extend(startup_blogs.fetch())
 
-    # ── Step 2: Dedup ──
-    print(f"\n[2/4] 🧹 Deduplicating...")
+    # ── Step 2: Dedup & Sort ──
+    print(f"\n[2/4] 🧹 Deduplicating & sorting...")
     r_before, c_before = len(research_items), len(commercial_items)
     research_items = dedup(research_items)
     commercial_items = dedup(commercial_items)
+
+    # Sort by source for nice grouping in email
+    source_order_r = {"arXiv": 0, "HF Daily Papers": 1, "GitHub Trending": 2}
+    research_items.sort(key=lambda x: (
+        source_order_r.get(x["source"], 3),
+        x.get("primary_topic", "zzz"),  # Within arXiv, sort by topic
+    ))
+    commercial_items.sort(key=lambda x: x["source"])
+
     print(f"  Research: {r_before} → {len(research_items)}")
     print(f"  Commercial: {c_before} → {len(commercial_items)}")
 

@@ -1,4 +1,4 @@
-"""Hugging Face Daily Papers — Community-curated top papers."""
+"""Hugging Face Daily Papers — Community-curated top papers with full details."""
 
 import requests
 from datetime import datetime
@@ -16,15 +16,29 @@ def fetch():
 
         for paper in papers[:15]:  # Top 15
             p = paper.get("paper", {})
+
+            # Authors (up to 10)
+            raw_authors = p.get("authors", [])[:10]
+            author_names = []
+            for a in raw_authors:
+                name = a.get("name", "")
+                if name:
+                    author_names.append(name)
+
+            author_str = " · ".join(author_names)
+            author_count = len(p.get("authors", []))
+
+            # Full abstract
+            abstract = p.get("summary", "").replace("\n", " ").strip()
+
             items.append({
                 "source": "HF Daily Papers",
                 "category": "research",
                 "title": p.get("title", "").replace("\n", " ").strip(),
                 "url": f"https://huggingface.co/papers/{p.get('id', '')}",
-                "abstract": p.get("summary", "")[:500].replace("\n", " ").strip(),
-                "authors": ", ".join(
-                    a.get("name", "") for a in p.get("authors", [])[:3]
-                ),
+                "abstract": abstract,  # Full abstract
+                "authors": author_str,
+                "author_count": author_count,
                 "published": p.get("publishedAt", "")[:10],
                 "tags": ["HF Daily"],
                 "upvotes": paper.get("numUpvotes", 0),

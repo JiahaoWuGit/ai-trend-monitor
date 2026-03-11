@@ -11,13 +11,13 @@ from openai import OpenAI
 #   qwen-max     — 最强，复杂推理（$1.60/M input, $6.40/M output）
 #   qwen3.5-plus — 最新版，能力更强
 MODEL = "kimi-k2.5"
-MAX_TOKENS = 4000
+MAX_TOKENS = 40000
 
 # DashScope API 地址
 #   国内：https://dashscope.aliyuncs.com/compatible-mode/v1
 #   海外：https://dashscope-intl.aliyuncs.com/compatible-mode/v1
+# BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1"
 BASE_URL = "https://coding.dashscope.aliyuncs.com/v1"
-
 
 
 def summarize(research_items: list, commercial_items: list) -> dict:
@@ -34,8 +34,8 @@ def summarize(research_items: list, commercial_items: list) -> dict:
             "research_summary": "（未配置 DASHSCOPE_API_KEY，跳过摘要生成）",
             "commercial_summary": "（未配置 DASHSCOPE_API_KEY，跳过摘要生成）",
             "top_picks": [],
-            "research_items": research_items[:20],
-            "commercial_items": commercial_items[:20],
+            "research_items": research_items[:100],
+            "commercial_items": commercial_items[:100],
         }
 
     client = OpenAI(
@@ -46,7 +46,7 @@ def summarize(research_items: list, commercial_items: list) -> dict:
     # Build context
     r_text = "\n".join(
         f"- [{i['source']}] {i['title']}: {i.get('abstract', '')[:200]}"
-        for i in research_items[:30]
+        for i in research_items[:100]
     )
     c_text = "\n".join(
         f"- [{i['source']}] {i['title']}: {i.get('abstract', '')[:200]}"
@@ -90,8 +90,8 @@ top_picks 选 3-5 条最值得 PhD 关注的条目（跨 research 和 commercial
                 text = text[4:]
         result = json.loads(text)
 
-        result["research_items"] = research_items[:20]
-        result["commercial_items"] = commercial_items[:20]
+        result["research_items"] = research_items[:100]
+        result["commercial_items"] = commercial_items[:100]
         print(f"  [Summarizer] Generated digest with {len(result.get('top_picks', []))} top picks (model: {MODEL})")
         return result
 
@@ -101,6 +101,6 @@ top_picks 选 3-5 条最值得 PhD 关注的条目（跨 research 和 commercial
             "research_summary": f"摘要生成失败: {e}",
             "commercial_summary": "",
             "top_picks": [],
-            "research_items": research_items[:20],
-            "commercial_items": commercial_items[:20],
+            "research_items": research_items[:100],
+            "commercial_items": commercial_items[:100],
         }

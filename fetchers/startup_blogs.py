@@ -1,11 +1,16 @@
-"""Commercial / Startup Tech Blogs — Anthropic Enterprise, Together AI, and leading AI startups."""
+"""Commercial / Startup Tech Blogs + Report Monitors.
+
+Covers: RSS blog feeds + page-scrape monitors for YC, Stanford AI Index.
+"""
 
 import feedparser
+import requests
+from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 from dateutil import parser as dateparser
 
-# ===== Blog Feeds =====
-# 按你的需要增减，格式：(名称, RSS URL, 分类标签)
+# ===== Blog RSS Feeds =====
+# 格式：(名称, RSS URL, 分类标签)
 BLOG_FEEDS = [
     # --- Tier 1: Enterprise AI Reports ---
     ("Anthropic Blog", "https://www.anthropic.com/rss.xml", ["Enterprise", "Safety", "Agent Infra"]),
@@ -28,6 +33,35 @@ BLOG_FEEDS = [
     ("Weights & Biases", "https://wandb.ai/fully-connected/rss.xml", ["MLOps", "Eval"]),
     ("Scale AI Blog", "https://scale.com/blog/rss.xml", ["Data", "RLHF", "Enterprise"]),
 ]
+
+# ===== Page Monitors (no RSS — scrape for new content) =====
+# 这些源没有 RSS feed，通过定期抓取页面检测更新
+PAGE_MONITORS = [
+    {
+        "name": "YC Requests for Startups",
+        "url": "https://www.ycombinator.com/rfs",
+        "backup_urls": [
+            "https://www.ycombinator.com/blog",
+        ],
+        "tags": ["AI-native", "Fintech", "Industrial"],
+        "keywords": ["request for startups", "rfs", "ai-native", "startup", "batch", "yc"],
+        "selectors": ["a[href*='rfs']", "a[href*='/blog/']", "h2 a", "h3 a"],
+        "icon": "🚀",
+    },
+    {
+        "name": "Stanford AI Index",
+        "url": "https://aiindex.stanford.edu/report/",
+        "backup_urls": [
+            "https://hai.stanford.edu/news",
+        ],
+        "tags": ["Investment", "Adoption", "Policy"],
+        "keywords": ["ai index", "artificial intelligence index", "ai report", "ai investment", "ai policy"],
+        "selectors": ["a[href*='report']", "a[href*='ai-index']", "h2 a", "h3 a", "article a"],
+        "icon": "🎓",
+    },
+]
+
+HEADERS = {"User-Agent": "Mozilla/5.0 (Macintosh; AI-Trend-Monitor/1.0)"}
 
 # 只看最近几天
 LOOKBACK_DAYS = 7
@@ -97,7 +131,80 @@ def fetch():
         except Exception as e:
             print(f"  [Blogs] Failed {blog_name}: {e}")
 
-    print(f"  [Startup Blogs] Fetched {len(items)} total posts")
+    print(f"  [Startup Blogs] Fetched {len(items)} RSS posts")
+
+    # ── Part 2: Page Monitors (YC, Stanford) ──
+    for monitor in PAGE_MONITORS:
+        monitor_items = _fetch_page_monitor(monitor, seen_urls)
+        items.extend(monitor_items)
+
+    print(f"  [Commercial Total] {len(items)} items")
+    return items
+
+
+def _fetch_page_monitor(monitor: dict, seen_urls: set) -> list:
+    """Scrape a page for new links matching keywords."""
+    items = []
+    name = monitor["name"]
+
+    all_urls = [monitor["url"]] + monitor.get("backup_urls", [])
+
+    for page_url in all_urls:
+        try:
+            resp = requests.get(page_url, headers=HEADERS, timeout=15)
+            if resp.status_code != 200:
+                continue
+
+            soup = BeautifulSoup(resp.text, "html.parser")
+            found = 0
+
+            for selector in monitor["selectors"]:
+                for link_el in soup.select(selector)[:20]:
+                    href = link_el.get("href", "")
+                    if not href or href == "#":
+                        continue
+
+                    # Make absolute URL
+                    if href.startswith("/"):
+                        from urllib.parse import urlparse
+                        base = urlparse(page_url)
+                        href = f"{base.scheme}://{base.netloc}{href}"
+
+                    if href in seen_urls:
+                        continue
+
+                    title = link_el.get_text(strip=True)
+                    if len(title) < 8 or len(title) > 250:
+                        continue
+
+                    # Keyword relevance check
+                    text = f"{title} {href}".lower()
+                    if not any(kw in text for kw in monitor["keywords"] + AI_KEYWORDS[:10]):
+                        continue
+
+                    seen_urls.add(href)
+                    items.append({
+                        "source": name,
+                        "category": "commercial",
+                        "title": title,
+                        "url": href,
+                        "abstract": "",
+                        "published": "",
+                        "tags": monitor["tags"],
+                    })
+                    found += 1
+                    if found >= 5:
+                        break
+                if found >= 5:
+                    break
+
+            if found > 0:
+                print(f"  [Monitor] {name}: {found} items from {page_url}")
+                break  # Got results, skip backup URLs
+
+        except Exception as e:
+            print(f"  [Monitor] {name} failed ({page_url[:50]}...): {e}")
+
     return items
 
 
