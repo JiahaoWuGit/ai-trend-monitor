@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Trend Digest — {{ date }}</title>
+<style>
+  body { margin: 0; padding: 0; background: #0f1117; color: #e2e8f0; font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; }
+  .container { max-width: 640px; margin: 0 auto; padding: 24px 16px; }
+
+  .header { padding: 24px 0 16px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 24px; }
+  .header h1 { font-size: 22px; font-weight: 700; margin: 0 0 4px; color: #f1f5f9; }
+  .header .date { font-size: 13px; color: rgba(255,255,255,0.35); }
+  .live-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #22c55e; margin-right: 6px; }
+
+  .summary-box { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 16px 20px; margin-bottom: 20px; }
+  .summary-box h3 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 8px; }
+  .summary-box p { font-size: 14px; line-height: 1.6; color: rgba(255,255,255,0.7); margin: 0; }
+  .research-box h3 { color: #818cf8; }
+  .commercial-box h3 { color: #34d399; }
+
+  .top-picks { margin: 24px 0; }
+  .top-picks h2 { font-size: 15px; font-weight: 700; color: #f1f5f9; margin: 0 0 12px; }
+  .pick { background: rgba(99,102,241,0.06); border: 1px solid rgba(99,102,241,0.15); border-radius: 8px; padding: 12px 16px; margin-bottom: 8px; }
+  .pick .pick-title { font-size: 14px; font-weight: 600; color: #e2e8f0; margin-bottom: 2px; }
+  .pick .pick-meta { font-size: 12px; color: rgba(255,255,255,0.4); }
+  .pick .pick-reason { font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 4px; }
+
+  .section { margin-top: 28px; }
+  .section h2 { font-size: 15px; font-weight: 700; margin: 0 0 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .section.research h2 { color: #818cf8; }
+  .section.commercial h2 { color: #34d399; }
+
+  .item { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+  .item:last-child { border-bottom: none; }
+  .item a { color: #e2e8f0; text-decoration: none; font-size: 13px; font-weight: 500; line-height: 1.4; }
+  .item a:hover { color: #818cf8; }
+  .item .meta { font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 2px; }
+  .tag { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 600; background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.45); margin-right: 4px; }
+
+  .footer { margin-top: 32px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 11px; color: rgba(255,255,255,0.2); text-align: center; }
+  .footer a { color: rgba(255,255,255,0.35); }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <h1><span class="live-dot"></span>AI / LLM / Agent Daily Digest</h1>
+    <div class="date">{{ date }} · {{ total_items }} items from {{ source_count }} sources</div>
+  </div>
+
+  <!-- AI Summary: Research -->
+  {% if research_summary %}
+  <div class="summary-box research-box">
+    <h3>🔬 Research 要点</h3>
+    <p>{{ research_summary }}</p>
+  </div>
+  {% endif %}
+
+  <!-- AI Summary: Commercial -->
+  {% if commercial_summary %}
+  <div class="summary-box commercial-box">
+    <h3>💼 Commercial 动态</h3>
+    <p>{{ commercial_summary }}</p>
+  </div>
+  {% endif %}
+
+  <!-- Top Picks -->
+  {% if top_picks %}
+  <div class="top-picks">
+    <h2>⭐ 今日必看 (Top Picks)</h2>
+    {% for pick in top_picks %}
+    <div class="pick">
+      <div class="pick-title">{{ pick.title }}</div>
+      <div class="pick-meta">{{ pick.source }}</div>
+      {% if pick.reason %}<div class="pick-reason">→ {{ pick.reason }}</div>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Research Items -->
+  {% if research_items %}
+  <div class="section research">
+    <h2>🔬 Research Feed ({{ research_items|length }})</h2>
+    {% for item in research_items %}
+    <div class="item">
+      <a href="{{ item.url }}">{{ item.title }}</a>
+      <div class="meta">
+        {% for tag in item.tags %}<span class="tag">{{ tag }}</span>{% endfor %}
+        {{ item.source }} · {{ item.published or '' }}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Commercial Items -->
+  {% if commercial_items %}
+  <div class="section commercial">
+    <h2>💼 Commercial Feed ({{ commercial_items|length }})</h2>
+    {% for item in commercial_items %}
+    <div class="item">
+      <a href="{{ item.url }}">{{ item.title }}</a>
+      <div class="meta">
+        {% for tag in item.tags %}<span class="tag">{{ tag }}</span>{% endfor %}
+        {{ item.source }} · {{ item.published or '' }}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Footer -->
+  <div class="footer">
+    PhD AI Trend Monitor v1.0 · Auto-generated by Claude<br>
+    <a href="https://github.com/YOUR_USERNAME/ai-trend-monitor">Edit sources & settings →</a>
+  </div>
+
+</div>
+</body>
+</html>

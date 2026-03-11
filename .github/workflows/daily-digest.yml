@@ -1,0 +1,39 @@
+name: Daily AI Trend Digest
+
+on:
+  schedule:
+    # 每天 UTC 23:00 = 北京时间 07:00
+    - cron: '0 23 * * *'
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run pipeline
+        env:
+          DASHSCOPE_API_KEY: ${{ secrets.DASHSCOPE_API_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+        run: python run_pipeline.py
+
+      - name: Upload digest artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: digest-${{ github.run_id }}
+          path: output/
+          retention-days: 30
