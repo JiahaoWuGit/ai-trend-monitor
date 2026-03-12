@@ -17,6 +17,7 @@
 | 源 | 采集方式 | 频率 |
 |---|---|---|
 | Stanford AI Index | 报告监控 | 年度 |
+| McKinsey State of AI | 报告监控 | 年度 |
 | OpenAI Enterprise Report | Blog RSS | 半年 |
 | Anthropic Enterprise / Blog | Blog RSS | 季度 |
 | Together AI Blog | Blog RSS | 每周 |
