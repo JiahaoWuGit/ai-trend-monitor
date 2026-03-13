@@ -39,9 +39,9 @@ BLOG_FEEDS = [
 PAGE_MONITORS = [
     {
         "name": "YC Requests for Startups",
-        "url": "https://www.ycombinator.com/rfs",
+        "url": "https://www.ycombinator.com/blog",
         "backup_urls": [
-            "https://www.ycombinator.com/blog",
+            "https://www.ycombinator.com/rfs",
         ],
         "tags": ["AI-native", "Fintech", "Industrial"],
         "keywords": ["request for startups", "rfs", "ai-native", "startup", "batch", "yc"],
