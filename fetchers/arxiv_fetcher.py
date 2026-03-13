@@ -21,7 +21,7 @@ QUERIES = [
 ]
 
 MAX_RESULTS_PER_QUERY = 8
-LOOKBACK_DAYS = 3
+LOOKBACK_DAYS = 4
 
 
 # ===== Topic 定义（用于按主题分组）=====
