@@ -1,5 +1,7 @@
 # AI Trend Monitor — Daily Email Digest
 
+> [中文版](README.md)
+
 Automatically aggregates **11 data sources** across Research and Commercial domains, generates AI-powered summaries, and delivers a digest email every morning at 7:00 AM (Beijing Time).
 
 ## Data Sources

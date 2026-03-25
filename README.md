@@ -1,5 +1,7 @@
 # 🔬 PhD AI/LLM/Agent 趋势监控 — 每日邮件推送
 
+> [English Version](README_EN.md)
+
 自动采集 Research + Commercial 两大板块共 **11 个信息源**，用 Claude 生成摘要，每天早上 7:00 推送 digest 邮件。
 
 ## 信息源
