@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Trend Digest — {{ date }}</title>
+<style>
+  /* === Base === */
+  body { margin: 0; padding: 0; background: #fafaf8; color: #1e293b; font-family: -apple-system, 'Segoe UI', Roboto, 'Noto Sans SC', sans-serif; -webkit-font-smoothing: antialiased; }
+  .container { max-width: 720px; margin: 0 auto; padding: 0 20px; }
+  a { text-decoration: none; }
+
+  /* === Header === */
+  .header { padding: 36px 0 24px; border-bottom: 1px solid #e5e7eb; margin-bottom: 28px; }
+  .header-badge { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 10px; }
+  .live-dot { width: 7px; height: 7px; border-radius: 50%; background: #16a34a; box-shadow: 0 0 8px rgba(22,163,106,0.4); }
+  .header-label { font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: #94a3b8; }
+  .header h1 { font-size: 28px; font-weight: 800; margin: 0; color: #0f172a; letter-spacing: -0.8px; line-height: 1.2; }
+  .header .sub { font-size: 13px; color: #94a3b8; margin: 4px 0 0; }
+  .stats-row { display: flex; gap: 8px; margin-top: 14px; }
+  .stat { padding: 4px 12px; border-radius: 5px; font-size: 11px; font-weight: 700; }
+  .stat-items { background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d; }
+  .stat-sources { background: #eef2ff; border: 1px solid #c7d2fe; color: #4338ca; }
+
+  /* === AI Summary === */
+  .summary-box { border-radius: 10px; padding: 18px 22px; margin-bottom: 14px; }
+  .summary-box h3 { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin: 0 0 10px; }
+  .summary-box p { font-size: 14px; line-height: 1.7; margin: 0; }
+  .research-box { background: #eef2ff; border: 1px solid #c7d2fe; border-left: 4px solid #6366f1; }
+  .research-box h3 { color: #4338ca; }
+  .research-box p { color: #475569; }
+  .commercial-box { background: #ecfdf5; border: 1px solid #a7f3d0; border-left: 4px solid #10b981; }
+  .commercial-box h3 { color: #047857; }
+  .commercial-box p { color: #475569; }
+
+  /* === Top Picks === */
+  .top-picks { margin: 28px 0; }
+  .top-picks-title { font-size: 16px; font-weight: 800; color: #b45309; margin: 0 0 14px; }
+  .pick { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 14px 18px; margin-bottom: 8px; }
+  .pick-title { font-size: 14px; font-weight: 600; color: #78350f; margin-bottom: 3px; }
+  .pick-meta { font-size: 11px; color: #a16207; }
+  .pick-reason { font-size: 13px; color: #92400e; margin-top: 5px; }
+
+  /* === Source Section Mega Headers === */
+  .source-section { margin-top: 32px; margin-bottom: 8px; border-radius: 12px; overflow: hidden; }
+
+  /* -- arXiv -- */
+  .source-arxiv { background: #faf5ff; border: 1px solid #e9d5ff; }
+  .source-arxiv .src-bar { height: 3px; background: linear-gradient(90deg, #a855f7, #7c3aed, #6d28d9); }
+  .source-arxiv .src-inner { padding: 16px 22px 14px; }
+  .source-arxiv .src-icon { font-size: 24px; }
+  .source-arxiv .src-name { font-size: 20px; font-weight: 800; color: #6b21a8; letter-spacing: -0.5px; font-family: 'Georgia', 'Times New Roman', serif; }
+  .source-arxiv .src-desc { font-size: 11px; color: #a78bfa; margin-top: 2px; }
+  .source-arxiv .src-count { background: #f3e8ff; color: #7c3aed; padding: 3px 10px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+
+  /* -- Hugging Face -- */
+  .source-hf { background: #fefce8; border: 1px solid #fef08a; }
+  .source-hf .src-bar { height: 3px; background: linear-gradient(90deg, #f59e0b, #d97706, #b45309); }
+  .source-hf .src-inner { padding: 16px 22px 14px; }
+  .source-hf .src-icon { font-size: 24px; }
+  .source-hf .src-name { font-size: 20px; font-weight: 800; color: #92400e; letter-spacing: -0.3px; font-family: 'Trebuchet MS', 'Lucida Sans', sans-serif; }
+  .source-hf .src-desc { font-size: 11px; color: #ca8a04; margin-top: 2px; }
+  .source-hf .src-count { background: #fef9c3; color: #a16207; padding: 3px 10px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+
+  /* -- GitHub -- */
+  .source-github { background: #f0fdf4; border: 1px solid #bbf7d0; }
+  .source-github .src-bar { height: 3px; background: linear-gradient(90deg, #22c55e, #16a34a, #15803d); }
+  .source-github .src-inner { padding: 16px 22px 14px; }
+  .source-github .src-icon { font-size: 24px; }
+  .source-github .src-name { font-size: 20px; font-weight: 800; color: #166534; letter-spacing: -0.3px; font-family: -apple-system, 'Segoe UI', monospace; }
+  .source-github .src-desc { font-size: 11px; color: #4ade80; margin-top: 2px; }
+  .source-github .src-count { background: #dcfce7; color: #15803d; padding: 3px 10px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+
+  /* -- Release Notes -- */
+  .source-release { background: #f0f9ff; border: 1px solid #bae6fd; }
+  .source-release .src-bar { height: 3px; background: linear-gradient(90deg, #38bdf8, #0ea5e9, #0284c7); }
+  .source-release .src-inner { padding: 16px 22px 14px; }
+  .source-release .src-icon { font-size: 24px; }
+  .source-release .src-name { font-size: 20px; font-weight: 800; color: #075985; letter-spacing: -0.3px; }
+  .source-release .src-desc { font-size: 11px; color: #38bdf8; margin-top: 2px; }
+  .source-release .src-count { background: #e0f2fe; color: #0369a1; padding: 3px 10px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+
+  /* -- Commercial: OpenAI -- */
+  .source-comm-openai { background: #ecfdf5; border: 1px solid #a7f3d0; }
+  .source-comm-openai .src-bar { height: 3px; background: linear-gradient(90deg, #10b981, #059669, #047857); }
+  .source-comm-openai .src-inner { padding: 16px 22px 14px; }
+  .source-comm-openai .src-icon { font-size: 24px; }
+  .source-comm-openai .src-name { font-size: 20px; font-weight: 800; color: #065f46; letter-spacing: -0.3px; }
+  .source-comm-openai .src-desc { font-size: 11px; color: #34d399; margin-top: 2px; }
+  .source-comm-openai .src-count { background: #d1fae5; color: #047857; padding: 3px 10px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+
+  /* -- Commercial: Anthropic -- */
+  .source-comm-anthropic { background: #fffbeb; border: 1px solid #fde68a; }
+  .source-comm-anthropic .src-bar { height: 3px; background: linear-gradient(90deg, #f59e0b, #d97706, #b45309); }
+  .source-comm-anthropic .src-inner { padding: 16px 22px 14px; }
+  .source-comm-anthropic .src-icon { font-size: 24px; }
+  .source-comm-anthropic .src-name { font-size: 20px; font-weight: 800; color: #92400e; letter-spacing: -0.3px; }
+  .source-comm-anthropic .src-desc { font-size: 11px; color: #f59e0b; margin-top: 2px; }
+  .source-comm-anthropic .src-count { background: #fef3c7; color: #b45309; padding: 3px 10px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+
+  /* -- Commercial: Hugging Face Blog -- */
+  .source-comm-hf { background: #fefce8; border: 1px solid #fef08a; }
+  .source-comm-hf .src-bar { height: 3px; background: linear-gradient(90deg, #fbbf24, #f59e0b, #eab308); }
+  .source-comm-hf .src-inner { padding: 16px 22px 14px; }
+  .source-comm-hf .src-icon { font-size: 24px; }
+  .source-comm-hf .src-name { font-size: 20px; font-weight: 800; color: #854d0e; letter-spacing: -0.3px; }
+  .source-comm-hf .src-desc { font-size: 11px; color: #ca8a04; margin-top: 2px; }
+  .source-comm-hf .src-count { background: #fef9c3; color: #a16207; padding: 3px 10px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+
+  /* -- Commercial: Together AI -- */
+  .source-comm-together { background: #eef2ff; border: 1px solid #c7d2fe; }
+  .source-comm-together .src-bar { height: 3px; background: linear-gradient(90deg, #6366f1, #4f46e5, #4338ca); }
+  .source-comm-together .src-inner { padding: 16px 22px 14px; }
+  .source-comm-together .src-icon { font-size: 24px; }
+  .source-comm-together .src-name { font-size: 20px; font-weight: 800; color: #3730a3; letter-spacing: -0.3px; }
+  .source-comm-together .src-desc { font-size: 11px; color: #818cf8; margin-top: 2px; }
+  .source-comm-together .src-count { background: #e0e7ff; color: #4338ca; padding: 3px 10px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+
+  /* -- Commercial: Cursor -- */
+  .source-comm-cursor { background: #fff1f2; border: 1px solid #fecdd3; }
+  .source-comm-cursor .src-bar { height: 3px; background: linear-gradient(90deg, #f43f5e, #e11d48, #be123c); }
+  .source-comm-cursor .src-inner { padding: 16px 22px 14px; }
+  .source-comm-cursor .src-icon { font-size: 24px; }
+  .source-comm-cursor .src-name { font-size: 20px; font-weight: 800; color: #9f1239; letter-spacing: -0.3px; }
+  .source-comm-cursor .src-desc { font-size: 11px; color: #fb7185; margin-top: 2px; }
+  .source-comm-cursor .src-count { background: #ffe4e6; color: #be123c; padding: 3px 10px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+
+  /* -- Commercial: Mistral -- */
+  .source-comm-mistral { background: #fff7ed; border: 1px solid #fed7aa; }
+  .source-comm-mistral .src-bar { height: 3px; background: linear-gradient(90deg, #f97316, #ea580c, #c2410c); }
+  .source-comm-mistral .src-inner { padding: 16px 22px 14px; }
+  .source-comm-mistral .src-icon { font-size: 24px; }
+  .source-comm-mistral .src-name { font-size: 20px; font-weight: 800; color: #9a3412; letter-spacing: -0.3px; }
+  .source-comm-mistral .src-desc { font-size: 11px; color: #fb923c; margin-top: 2px; }
+  .source-comm-mistral .src-count { background: #ffedd5; color: #c2410c; padding: 3px 10px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+
+  /* -- Commercial: Cohere -- */
+  .source-comm-cohere { background: #faf5ff; border: 1px solid #e9d5ff; }
+  .source-comm-cohere .src-bar { height: 3px; background: linear-gradient(90deg, #8b5cf6, #7c3aed, #6d28d9); }
+  .source-comm-cohere .src-inner { padding: 16px 22px 14px; }
+  .source-comm-cohere .src-icon { font-size: 24px; }
+  .source-comm-cohere .src-name { font-size: 20px; font-weight: 800; color: #5b21b6; letter-spacing: -0.3px; }
+  .source-comm-cohere .src-desc { font-size: 11px; color: #a78bfa; margin-top: 2px; }
+  .source-comm-cohere .src-count { background: #f3e8ff; color: #6d28d9; padding: 3px 10px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+
+  /* -- Commercial: Replit -- */
+  .source-comm-replit { background: #fefce8; border: 1px solid #fef08a; }
+  .source-comm-replit .src-bar { height: 3px; background: linear-gradient(90deg, #eab308, #ca8a04, #a16207); }
+  .source-comm-replit .src-inner { padding: 16px 22px 14px; }
+  .source-comm-replit .src-icon { font-size: 24px; }
+  .source-comm-replit .src-name { font-size: 20px; font-weight: 800; color: #854d0e; letter-spacing: -0.3px; }
+  .source-comm-replit .src-desc { font-size: 11px; color: #ca8a04; margin-top: 2px; }
+  .source-comm-replit .src-count { background: #fef9c3; color: #a16207; padding: 3px 10px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+
+  /* -- Commercial: LangChain -- */
+  .source-comm-langchain { background: #f0fdf4; border: 1px solid #bbf7d0; }
+  .source-comm-langchain .src-bar { height: 3px; background: linear-gradient(90deg, #22c55e, #16a34a, #15803d); }
+  .source-comm-langchain .src-inner { padding: 16px 22px 14px; }
+  .source-comm-langchain .src-icon { font-size: 24px; }
+  .source-comm-langchain .src-name { font-size: 20px; font-weight: 800; color: #166534; letter-spacing: -0.3px; }
+  .source-comm-langchain .src-desc { font-size: 11px; color: #4ade80; margin-top: 2px; }
+  .source-comm-langchain .src-count { background: #dcfce7; color: #15803d; padding: 3px 10px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+
+  /* -- Commercial: Modal -- */
+  .source-comm-modal { background: #f8fafc; border: 1px solid #e2e8f0; }
+  .source-comm-modal .src-bar { height: 3px; background: linear-gradient(90deg, #94a3b8, #64748b, #475569); }
+  .source-comm-modal .src-inner { padding: 16px 22px 14px; }
+  .source-comm-modal .src-icon { font-size: 24px; }
+  .source-comm-modal .src-name { font-size: 20px; font-weight: 800; color: #334155; letter-spacing: -0.3px; }
+  .source-comm-modal .src-desc { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+  .source-comm-modal .src-count { background: #f1f5f9; color: #475569; padding: 3px 10px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+
+  /* -- Commercial: YC -- */
+  .source-comm-yc { background: #fff7ed; border: 1px solid #fed7aa; }
+  .source-comm-yc .src-bar { height: 3px; background: linear-gradient(90deg, #ff6600, #ea580c, #c2410c); }
+  .source-comm-yc .src-inner { padding: 16px 22px 14px; }
+  .source-comm-yc .src-icon { font-size: 24px; }
+  .source-comm-yc .src-name { font-size: 20px; font-weight: 800; color: #9a3412; letter-spacing: -0.3px; }
+  .source-comm-yc .src-desc { font-size: 11px; color: #fb923c; margin-top: 2px; }
+  .source-comm-yc .src-count { background: #ffedd5; color: #c2410c; padding: 3px 10px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+
+  /* -- Commercial: Stanford -- */
+  .source-comm-stanford { background: #fef2f2; border: 1px solid #fecaca; }
+  .source-comm-stanford .src-bar { height: 3px; background: linear-gradient(90deg, #b91c1c, #991b1b, #7f1d1d); }
+  .source-comm-stanford .src-inner { padding: 16px 22px 14px; }
+  .source-comm-stanford .src-icon { font-size: 24px; }
+  .source-comm-stanford .src-name { font-size: 20px; font-weight: 800; color: #991b1b; letter-spacing: -0.3px; }
+  .source-comm-stanford .src-desc { font-size: 11px; color: #f87171; margin-top: 2px; }
+  .source-comm-stanford .src-count { background: #fee2e2; color: #b91c1c; padding: 3px 10px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+
+  /* -- Commercial: Perplexity -- */
+  .source-comm-perplexity { background: #f0f9ff; border: 1px solid #bae6fd; }
+  .source-comm-perplexity .src-bar { height: 3px; background: linear-gradient(90deg, #0ea5e9, #0284c7, #0369a1); }
+  .source-comm-perplexity .src-inner { padding: 16px 22px 14px; }
+  .source-comm-perplexity .src-icon { font-size: 24px; }
+  .source-comm-perplexity .src-name { font-size: 20px; font-weight: 800; color: #075985; letter-spacing: -0.3px; }
+  .source-comm-perplexity .src-desc { font-size: 11px; color: #38bdf8; margin-top: 2px; }
+  .source-comm-perplexity .src-count { background: #e0f2fe; color: #0369a1; padding: 3px 10px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+
+  /* -- Commercial: Default / Others -- */
+  .source-comm-default { background: #f8fafc; border: 1px solid #e2e8f0; }
+  .source-comm-default .src-bar { height: 3px; background: linear-gradient(90deg, #f43f5e, #e11d48, #be123c); }
+  .source-comm-default .src-inner { padding: 16px 22px 14px; }
+  .source-comm-default .src-icon { font-size: 24px; }
+  .source-comm-default .src-name { font-size: 20px; font-weight: 800; color: #9f1239; letter-spacing: -0.3px; }
+  .source-comm-default .src-desc { font-size: 11px; color: #fb7185; margin-top: 2px; }
+  .source-comm-default .src-count { background: #ffe4e6; color: #be123c; padding: 3px 10px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+
+  .src-header-row { display: flex; align-items: center; justify-content: space-between; }
+  .src-left { display: flex; align-items: center; gap: 10px; }
+
+  /* === Topic divider (within arXiv) === */
+  .topic-divider { display: flex; align-items: center; gap: 8px; padding: 10px 0 6px; margin-top: 8px; }
+  .topic-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .topic-name { font-size: 12px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+
+  /* === Blog sub-source label === */
+  .blog-label { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-bottom: 4px; }
+
+  /* === Items === */
+  .item { padding: 12px 22px 14px; border-bottom: 1px solid rgba(0,0,0,0.04); }
+  .item:last-child { border-bottom: none; }
+  .item-title { margin: 0; }
+  .item-title a { color: #1e293b; font-size: 14px; font-weight: 600; line-height: 1.45; }
+  .item-title a:hover { color: #4338ca; }
+  .item-abstract { font-size: 12.5px; line-height: 1.6; color: #64748b; margin: 6px 0 0; }
+  .item-authors { font-size: 11.5px; line-height: 1.5; color: #94a3b8; margin: 6px 0 0; font-style: italic; }
+  .item-author-overflow { font-size: 10.5px; color: #cbd5e1; }
+  .item-meta { font-size: 11px; color: #94a3b8; margin-top: 6px; display: flex; align-items: center; flex-wrap: wrap; gap: 5px; }
+  .dot { color: #d1d5db; }
+
+  /* === Tags with source-specific colors === */
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.3px; }
+  /* arXiv topic colors */
+  .tag-safety { background: #fef2f2; color: #dc2626; }
+  .tag-sandbox { background: #fffbeb; color: #d97706; }
+  .tag-permission { background: #fdf4ff; color: #c026d3; }
+  .tag-governance { background: #ecfdf5; color: #059669; }
+  .tag-eval { background: #fff7ed; color: #ea580c; }
+  .tag-computer { background: #eff6ff; color: #2563eb; }
+  .tag-memory { background: #f5f3ff; color: #7c3aed; }
+  .tag-tool { background: #ecfeff; color: #0891b2; }
+  .tag-multiagent { background: #fdf2f8; color: #db2777; }
+  .tag-agent { background: #eef2ff; color: #4f46e5; }
+  /* GitHub tags */
+  .tag-gh { background: #f0fdf4; color: #16a34a; }
+  /* HF tags */
+  .tag-hf { background: #fefce8; color: #a16207; }
+  /* Release tags */
+  .tag-release { background: #f0f9ff; color: #0284c7; }
+  /* Commercial tags */
+  .tag-comm { background: #fff1f2; color: #e11d48; }
+  /* Blog-specific accent labels */
+  .blog-anthropic { background: #fef3c7; color: #92400e; }
+  .blog-openai { background: #d1fae5; color: #065f46; }
+  .blog-together { background: #e0e7ff; color: #3730a3; }
+  .blog-cursor { background: #ffe4e6; color: #9f1239; }
+  .blog-perplexity { background: #e0f2fe; color: #075985; }
+  .blog-cohere { background: #f3e8ff; color: #5b21b6; }
+  .blog-mistral { background: #ffedd5; color: #9a3412; }
+  .blog-replit { background: #fef9c3; color: #854d0e; }
+  .blog-langchain { background: #dcfce7; color: #166534; }
+  .blog-hf { background: #fef9c3; color: #854d0e; }
+  .blog-modal { background: #f1f5f9; color: #334155; }
+  .blog-anyscale { background: #e0f2fe; color: #075985; }
+  .blog-vercel { background: #f1f5f9; color: #334155; }
+  .blog-scale { background: #fce7f3; color: #9d174d; }
+  .blog-wandb { background: #fef3c7; color: #92400e; }
+  .blog-yc { background: #ffedd5; color: #9a3412; }
+  .blog-stanford { background: #fee2e2; color: #991b1b; }
+  .blog-default { background: #f1f5f9; color: #64748b; }
+
+  /* === Section Dividers === */
+  .mega-divider { margin: 40px 0 8px; display: flex; align-items: center; gap: 12px; }
+  .mega-divider-bar { width: 5px; height: 28px; border-radius: 3px; }
+  .mega-divider-bar-r { background: linear-gradient(180deg, #6366f1, #3b82f6); }
+  .mega-divider-bar-c { background: linear-gradient(180deg, #22c55e, #10b981); }
+  .mega-divider h2 { font-size: 18px; font-weight: 800; margin: 0; letter-spacing: -0.5px; }
+  .mega-divider-r h2 { color: #3730a3; }
+  .mega-divider-c h2 { color: #065f46; }
+  .mega-divider .count { font-size: 11px; color: #94a3b8; font-weight: 600; }
+
+  /* === Deep Analysis === */
+  .toggle-btn {
+    display: inline-flex; align-items: center; gap: 4px;
+    margin-top: 8px; padding: 4px 12px; border-radius: 6px;
+    font-size: 11px; font-weight: 600; cursor: pointer;
+    background: #f0f9ff; border: 1px solid #bae6fd; color: #0369a1;
+    transition: all 0.15s ease;
+  }
+  .toggle-btn:hover { background: #e0f2fe; border-color: #7dd3fc; }
+  .toggle-btn.active { background: #dbeafe; border-color: #93c5fd; color: #1d4ed8; }
+  .toggle-btn .arrow { font-size: 9px; transition: transform 0.2s ease; }
+  .toggle-btn.active .arrow { transform: rotate(90deg); }
+  .deep-analysis {
+    margin: 10px 0 4px; padding: 14px 18px; border-radius: 8px;
+    background: linear-gradient(135deg, #f0f9ff 0%, #eff6ff 100%);
+    border: 1px solid #bfdbfe; border-left: 3px solid #3b82f6;
+    font-size: 13px; line-height: 1.7; color: #334155;
+  }
+  .deep-analysis strong { color: #1e40af; display: block; margin-top: 10px; }
+  .deep-analysis strong:first-child { margin-top: 0; }
+  .deep-analysis p { margin: 4px 0 8px; }
+  .deep-analysis ul { margin: 4px 0 8px; padding-left: 20px; }
+  .deep-analysis li { margin-bottom: 3px; }
+
+  /* === Footer === */
+  .footer { margin-top: 44px; padding: 18px 0 36px; border-top: 1px solid #e5e7eb; font-size: 11px; color: #cbd5e1; text-align: center; line-height: 1.6; }
+  .footer a { color: #94a3b8; }
+</style>
+</head>
+<body>
+{% macro deep_analysis_toggle(item) %}
+{% if item.deep_analysis is defined and item.deep_analysis %}
+<button class="toggle-btn" onclick="toggleAnalysis(this)"><span class="arrow">&#9654;</span> Deep Analysis</button>
+<div class="deep-analysis" style="display:none">{{ item.deep_analysis|safe }}</div>
+{% endif %}
+{% endmacro %}
+<div class="container">
+
+  <!-- ╔══ Header ══╗ -->
+  <div class="header">
+    <div class="header-badge">
+      <span class="live-dot"></span>
+      <span class="header-label">DAILY MONITORING</span>
+    </div>
+    <h1>AI / LLM / Agent Digest</h1>
+    <p class="sub">PhD 趋势监控工作流 · {{ date }}</p>
+    <div class="stats-row">
+      <span class="stat stat-items">{{ total_items }} items</span>
+      <span class="stat stat-sources">{{ source_count }} sources</span>
+    </div>
+  </div>
+
+  <!-- ╔══ AI Summaries ══╗ -->
+  {% if research_summary and '未配置' not in research_summary %}
+  <div class="summary-box research-box">
+    <h3>🔬 Research 要点</h3>
+    <p>{{ research_summary }}</p>
+  </div>
+  {% endif %}
+  {% if commercial_summary and '未配置' not in commercial_summary %}
+  <div class="summary-box commercial-box">
+    <h3>💼 Commercial 动态</h3>
+    <p>{{ commercial_summary }}</p>
+  </div>
+  {% endif %}
+
+  <!-- ╔══ Top Picks ══╗ -->
+  {% if top_picks %}
+  <div class="top-picks">
+    <div class="top-picks-title">⭐ 今日必看</div>
+    {% for pick in top_picks %}
+    <div class="pick">
+      <div class="pick-title">{{ pick.title }}</div>
+      <div class="pick-meta">{{ pick.source }}</div>
+      {% if pick.reason %}<div class="pick-reason">→ {{ pick.reason }}</div>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- ╔══════════════════════════════════════╗ -->
+  <!-- ║       RESEARCH FEED                  ║ -->
+  <!-- ╚══════════════════════════════════════╝ -->
+  {% if research_items %}
+  <div class="mega-divider mega-divider-r">
+    <div class="mega-divider-bar mega-divider-bar-r"></div>
+    <h2>🔬 Research Feed</h2>
+    <span class="count">{{ research_items|length }} items</span>
+  </div>
+
+  <!-- ── arXiv Papers ── -->
+  {% set arxiv_items = research_items|selectattr("source", "equalto", "arXiv")|list %}
+  {% if arxiv_items %}
+  <div class="source-section source-arxiv">
+    <div class="src-bar"></div>
+    <div class="src-inner">
+      <div class="src-header-row">
+        <div class="src-left">
+          <span class="src-icon">📑</span>
+          <div>
+            <div class="src-name">arXiv Papers</div>
+            <div class="src-desc">Agent · Safety · Governance · Eval · Tool Use · Memory</div>
+          </div>
+        </div>
+        <span class="src-count">{{ arxiv_items|length }} papers</span>
+      </div>
+    </div>
+
+    {# Group arXiv papers by primary_topic #}
+    {% set ns = namespace(current_topic='') %}
+    {% for item in arxiv_items|sort(attribute='primary_topic') %}
+      {% set topic = item.primary_topic|default('Agent (General)') %}
+      {% if topic != ns.current_topic %}
+        {% set ns.current_topic = topic %}
+        <div class="topic-divider" style="padding-left: 22px;">
+          <div class="topic-dot" style="background: {% if 'Safety' in topic %}#ef4444{% elif 'Sandbox' in topic %}#f59e0b{% elif 'Permission' in topic %}#d946ef{% elif 'Governance' in topic %}#10b981{% elif 'Eval' in topic %}#f97316{% elif 'Computer' in topic %}#3b82f6{% elif 'Memory' in topic %}#8b5cf6{% elif 'Tool' in topic %}#06b6d4{% elif 'Multi' in topic %}#ec4899{% else %}#6366f1{% endif %};"></div>
+          <span class="topic-name" style="color: {% if 'Safety' in topic %}#dc2626{% elif 'Sandbox' in topic %}#d97706{% elif 'Permission' in topic %}#c026d3{% elif 'Governance' in topic %}#059669{% elif 'Eval' in topic %}#ea580c{% elif 'Computer' in topic %}#2563eb{% elif 'Memory' in topic %}#7c3aed{% elif 'Tool' in topic %}#0891b2{% elif 'Multi' in topic %}#db2777{% else %}#4f46e5{% endif %};">{{ topic }}</span>
+        </div>
+      {% endif %}
+      <div class="item">
+        <p class="item-title"><a href="{{ item.url }}">{{ item.title }}</a></p>
+        {% if item.authors %}<div class="item-authors">{{ item.authors }}{% if item.author_count is defined and item.author_count > 10 %} <span class="item-author-overflow">... +{{ item.author_count - 10 }} more</span>{% endif %}</div>{% endif %}
+        <div class="item-meta">
+          {% for tag in item.tags %}
+          <span class="tag {% if 'Safety' in tag %}tag-safety{% elif 'Sandbox' in tag %}tag-sandbox{% elif 'Permission' in tag %}tag-permission{% elif 'Governance' in tag %}tag-governance{% elif 'Eval' in tag %}tag-eval{% elif 'Computer' in tag %}tag-computer{% elif 'Memory' in tag %}tag-memory{% elif 'Tool' in tag %}tag-tool{% elif 'Multi' in tag %}tag-multiagent{% else %}tag-agent{% endif %}">{{ tag }}</span>
+          {% endfor %}
+          {% if item.published %}<span class="dot">·</span> {{ item.published }}{% endif %}
+          {% if item.arxiv_id is defined %}<span class="dot">·</span> {{ item.arxiv_id }}{% endif %}
+        </div>
+        {{ deep_analysis_toggle(item) }}
+      </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- ── HF Daily Papers ── -->
+  {% set hf_items = research_items|selectattr("source", "equalto", "HF Daily Papers")|list %}
+  {% if hf_items %}
+  <div class="source-section source-hf">
+    <div class="src-bar"></div>
+    <div class="src-inner">
+      <div class="src-header-row">
+        <div class="src-left">
+          <span class="src-icon">🤗</span>
+          <div>
+            <div class="src-name">Hugging Face Daily Papers</div>
+            <div class="src-desc">Community-curated top papers · Sorted by upvotes</div>
+          </div>
+        </div>
+        <span class="src-count">{{ hf_items|length }} papers</span>
+      </div>
+    </div>
+    {% for item in hf_items %}
+    <div class="item">
+      <p class="item-title"><a href="{{ item.url }}">{{ item.title }}</a></p>
+      {% if item.authors %}<div class="item-authors">{{ item.authors }}</div>{% endif %}
+      <div class="item-meta">
+        {% for tag in item.tags %}<span class="tag tag-hf">{{ tag }}</span>{% endfor %}
+        {% if item.upvotes is defined and item.upvotes %}<span class="tag tag-hf">▲ {{ item.upvotes }}</span>{% endif %}
+        {% if item.published %}<span class="dot">·</span> {{ item.published }}{% endif %}
+      </div>
+      {{ deep_analysis_toggle(item) }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- ── GitHub Trending ── -->
+  {% set gh_items = research_items|selectattr("source", "equalto", "GitHub Trending")|list %}
+  {% if gh_items %}
+  <div class="source-section source-github">
+    <div class="src-bar"></div>
+    <div class="src-inner">
+      <div class="src-header-row">
+        <div class="src-left">
+          <span class="src-icon">⚡</span>
+          <div>
+            <div class="src-name">GitHub Trending</div>
+            <div class="src-desc">AI · Agent · Inference · Eval · Safety</div>
+          </div>
+        </div>
+        <span class="src-count">{{ gh_items|length }} repos</span>
+      </div>
+    </div>
+    {% for item in gh_items %}
+    <div class="item">
+      <p class="item-title"><a href="{{ item.url }}">{{ item.title }}</a></p>
+      {% if item.abstract %}<div class="item-abstract">{{ item.abstract }}</div>{% endif %}
+      <div class="item-meta">
+        {% for tag in item.tags %}<span class="tag tag-gh">{{ tag }}</span>{% endfor %}
+        {% if item.language is defined and item.language %}<span class="tag tag-gh">{{ item.language }}</span>{% endif %}
+        {% if item.stars_today is defined and item.stars_today %}<span class="dot">·</span> <strong style="color:#16a34a;">{{ item.stars_today }}</strong>{% endif %}
+        {% if item.published %}<span class="dot">·</span> {{ item.published }}{% endif %}
+      </div>
+      {{ deep_analysis_toggle(item) }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- ── Release Notes ── -->
+  {% set release_items = research_items|rejectattr("source", "equalto", "arXiv")|rejectattr("source", "equalto", "HF Daily Papers")|rejectattr("source", "equalto", "GitHub Trending")|list %}
+  {% if release_items %}
+  <div class="source-section source-release">
+    <div class="src-bar"></div>
+    <div class="src-inner">
+      <div class="src-header-row">
+        <div class="src-left">
+          <span class="src-icon">🏢</span>
+          <div>
+            <div class="src-name">Model Provider Updates</div>
+            <div class="src-desc">OpenAI · Anthropic · Google · Meta · Mistral</div>
+          </div>
+        </div>
+        <span class="src-count">{{ release_items|length }} updates</span>
+      </div>
+    </div>
+    {% for item in release_items %}
+    <div class="item">
+      <p class="item-title"><a href="{{ item.url }}">{{ item.title }}</a></p>
+      {% if item.abstract %}<div class="item-abstract">{{ item.abstract }}</div>{% endif %}
+      <div class="item-meta">
+        {% for tag in item.tags %}<span class="tag tag-release">{{ tag }}</span>{% endfor %}
+        <span class="dot">·</span> {{ item.source }}
+        {% if item.published %}<span class="dot">·</span> {{ item.published }}{% endif %}
+      </div>
+      {{ deep_analysis_toggle(item) }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% endif %}{# end research_items #}
+
+
+  <!-- ╔══════════════════════════════════════╗ -->
+  <!-- ║       COMMERCIAL FEED                ║ -->
+  <!-- ╚══════════════════════════════════════╝ -->
+  {% if commercial_items %}
+  <div class="mega-divider mega-divider-c">
+    <div class="mega-divider-bar mega-divider-bar-c"></div>
+    <h2>💼 Commercial / Startup Feed</h2>
+    <span class="count">{{ commercial_items|length }} items</span>
+  </div>
+
+  <!-- ── OpenAI Blog ── -->
+  {% set openai_items = commercial_items|selectattr("source", "equalto", "OpenAI Blog")|list %}
+  {% if openai_items %}
+  <div class="source-section source-comm-openai">
+    <div class="src-bar"></div>
+    <div class="src-inner">
+      <div class="src-header-row">
+        <div class="src-left">
+          <span class="src-icon">🟢</span>
+          <div>
+            <div class="src-name">OpenAI Blog</div>
+            <div class="src-desc">Enterprise · Infrastructure · Product Updates</div>
+          </div>
+        </div>
+        <span class="src-count">{{ openai_items|length }} posts</span>
+      </div>
+    </div>
+    {% for item in openai_items %}
+    <div class="item">
+      <p class="item-title"><a href="{{ item.url }}">{{ item.title }}</a></p>
+      {% if item.abstract %}<div class="item-abstract">{{ item.abstract }}</div>{% endif %}
+      <div class="item-meta">
+        {% for tag in item.tags %}<span class="tag tag-comm">{{ tag }}</span>{% endfor %}
+        {% if item.published %}<span class="dot">·</span> {{ item.published }}{% endif %}
+      </div>
+      {{ deep_analysis_toggle(item) }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- ── Anthropic Blog ── -->
+  {% set anthropic_items = commercial_items|selectattr("source", "equalto", "Anthropic Blog")|list %}
+  {% if anthropic_items %}
+  <div class="source-section source-comm-anthropic">
+    <div class="src-bar"></div>
+    <div class="src-inner">
+      <div class="src-header-row">
+        <div class="src-left">
+          <span class="src-icon">🔶</span>
+          <div>
+            <div class="src-name">Anthropic Blog</div>
+            <div class="src-desc">Safety · Agent Infra · Enterprise</div>
+          </div>
+        </div>
+        <span class="src-count">{{ anthropic_items|length }} posts</span>
+      </div>
+    </div>
+    {% for item in anthropic_items %}
+    <div class="item">
+      <p class="item-title"><a href="{{ item.url }}">{{ item.title }}</a></p>
+      {% if item.abstract %}<div class="item-abstract">{{ item.abstract }}</div>{% endif %}
+      <div class="item-meta">
+        {% for tag in item.tags %}<span class="tag tag-comm">{{ tag }}</span>{% endfor %}
+        {% if item.published %}<span class="dot">·</span> {{ item.published }}{% endif %}
+      </div>
+      {{ deep_analysis_toggle(item) }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- ── Hugging Face Blog ── -->
+  {% set hf_blog_items = commercial_items|selectattr("source", "equalto", "Hugging Face Blog")|list %}
+  {% if hf_blog_items %}
+  <div class="source-section source-comm-hf">
+    <div class="src-bar"></div>
+    <div class="src-inner">
+      <div class="src-header-row">
+        <div class="src-left">
+          <span class="src-icon">🤗</span>
+          <div>
+            <div class="src-name">Hugging Face Blog</div>
+            <div class="src-desc">Open Source · Models · Community</div>
+          </div>
+        </div>
+        <span class="src-count">{{ hf_blog_items|length }} posts</span>
+      </div>
+    </div>
+    {% for item in hf_blog_items %}
+    <div class="item">
+      <p class="item-title"><a href="{{ item.url }}">{{ item.title }}</a></p>
+      {% if item.abstract %}<div class="item-abstract">{{ item.abstract }}</div>{% endif %}
+      <div class="item-meta">
+        {% for tag in item.tags %}<span class="tag tag-comm">{{ tag }}</span>{% endfor %}
+        {% if item.published %}<span class="dot">·</span> {{ item.published }}{% endif %}
+      </div>
+      {{ deep_analysis_toggle(item) }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- ── Together AI Blog ── -->
+  {% set together_items = commercial_items|selectattr("source", "equalto", "Together AI Blog")|list %}
+  {% if together_items %}
+  <div class="source-section source-comm-together">
+    <div class="src-bar"></div>
+    <div class="src-inner">
+      <div class="src-header-row">
+        <div class="src-left">
+          <span class="src-icon">🚀</span>
+          <div>
+            <div class="src-name">Together AI Blog</div>
+            <div class="src-desc">Open Models · Inference · Infrastructure</div>
+          </div>
+        </div>
+        <span class="src-count">{{ together_items|length }} posts</span>
+      </div>
+    </div>
+    {% for item in together_items %}
+    <div class="item">
+      <p class="item-title"><a href="{{ item.url }}">{{ item.title }}</a></p>
+      {% if item.abstract %}<div class="item-abstract">{{ item.abstract }}</div>{% endif %}
+      <div class="item-meta">
+        {% for tag in item.tags %}<span class="tag tag-comm">{{ tag }}</span>{% endfor %}
+        {% if item.published %}<span class="dot">·</span> {{ item.published }}{% endif %}
+      </div>
+      {{ deep_analysis_toggle(item) }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- ── Mistral Blog ── -->
+  {% set mistral_items = commercial_items|selectattr("source", "equalto", "Mistral Blog")|list %}
+  {% if mistral_items %}
+  <div class="source-section source-comm-mistral">
+    <div class="src-bar"></div>
+    <div class="src-inner">
+      <div class="src-header-row">
+        <div class="src-left">
+          <span class="src-icon">🌬️</span>
+          <div>
+            <div class="src-name">Mistral Blog</div>
+            <div class="src-desc">Open Models · Enterprise</div>
+          </div>
+        </div>
+        <span class="src-count">{{ mistral_items|length }} posts</span>
+      </div>
+    </div>
+    {% for item in mistral_items %}
+    <div class="item">
+      <p class="item-title"><a href="{{ item.url }}">{{ item.title }}</a></p>
+      {% if item.abstract %}<div class="item-abstract">{{ item.abstract }}</div>{% endif %}
+      <div class="item-meta">
+        {% for tag in item.tags %}<span class="tag tag-comm">{{ tag }}</span>{% endfor %}
+        {% if item.published %}<span class="dot">·</span> {{ item.published }}{% endif %}
+      </div>
+      {{ deep_analysis_toggle(item) }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- ── Cohere Blog ── -->
+  {% set cohere_items = commercial_items|selectattr("source", "equalto", "Cohere Blog")|list %}
+  {% if cohere_items %}
+  <div class="source-section source-comm-cohere">
+    <div class="src-bar"></div>
+    <div class="src-inner">
+      <div class="src-header-row">
+        <div class="src-left">
+          <span class="src-icon">💬</span>
+          <div>
+            <div class="src-name">Cohere Blog</div>
+            <div class="src-desc">Enterprise RAG · Embeddings</div>
+          </div>
+        </div>
+        <span class="src-count">{{ cohere_items|length }} posts</span>
+      </div>
+    </div>
+    {% for item in cohere_items %}
+    <div class="item">
+      <p class="item-title"><a href="{{ item.url }}">{{ item.title }}</a></p>
+      {% if item.abstract %}<div class="item-abstract">{{ item.abstract }}</div>{% endif %}
+      <div class="item-meta">
+        {% for tag in item.tags %}<span class="tag tag-comm">{{ tag }}</span>{% endfor %}
+        {% if item.published %}<span class="dot">·</span> {{ item.published }}{% endif %}
+      </div>
+      {{ deep_analysis_toggle(item) }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- ── Cursor Blog ── -->
+  {% set cursor_items = commercial_items|selectattr("source", "equalto", "Cursor Blog")|list %}
+  {% if cursor_items %}
+  <div class="source-section source-comm-cursor">
+    <div class="src-bar"></div>
+    <div class="src-inner">
+      <div class="src-header-row">
+        <div class="src-left">
+          <span class="src-icon">⌨️</span>
+          <div>
+            <div class="src-name">Cursor Blog</div>
+            <div class="src-desc">Coding Agent · IDE</div>
+          </div>
+        </div>
+        <span class="src-count">{{ cursor_items|length }} posts</span>
+      </div>
+    </div>
+    {% for item in cursor_items %}
+    <div class="item">
+      <p class="item-title"><a href="{{ item.url }}">{{ item.title }}</a></p>
+      {% if item.abstract %}<div class="item-abstract">{{ item.abstract }}</div>{% endif %}
+      <div class="item-meta">
+        {% for tag in item.tags %}<span class="tag tag-comm">{{ tag }}</span>{% endfor %}
+        {% if item.published %}<span class="dot">·</span> {{ item.published }}{% endif %}
+      </div>
+      {{ deep_analysis_toggle(item) }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- ── Replit Blog ── -->
+  {% set replit_items = commercial_items|selectattr("source", "equalto", "Replit Blog")|list %}
+  {% if replit_items %}
+  <div class="source-section source-comm-replit">
+    <div class="src-bar"></div>
+    <div class="src-inner">
+      <div class="src-header-row">
+        <div class="src-left">
+          <span class="src-icon">💻</span>
+          <div>
+            <div class="src-name">Replit Blog</div>
+            <div class="src-desc">Coding Agent · Platform</div>
+          </div>
+        </div>
+        <span class="src-count">{{ replit_items|length }} posts</span>
+      </div>
+    </div>
+    {% for item in replit_items %}
+    <div class="item">
+      <p class="item-title"><a href="{{ item.url }}">{{ item.title }}</a></p>
+      {% if item.abstract %}<div class="item-abstract">{{ item.abstract }}</div>{% endif %}
+      <div class="item-meta">
+        {% for tag in item.tags %}<span class="tag tag-comm">{{ tag }}</span>{% endfor %}
+        {% if item.published %}<span class="dot">·</span> {{ item.published }}{% endif %}
+      </div>
+      {{ deep_analysis_toggle(item) }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- ── LangChain Blog ── -->
+  {% set langchain_items = commercial_items|selectattr("source", "equalto", "LangChain Blog")|list %}
+  {% if langchain_items %}
+  <div class="source-section source-comm-langchain">
+    <div class="src-bar"></div>
+    <div class="src-inner">
+      <div class="src-header-row">
+        <div class="src-left">
+          <span class="src-icon">🦜</span>
+          <div>
+            <div class="src-name">LangChain Blog</div>
+            <div class="src-desc">Agent Infra · Framework</div>
+          </div>
+        </div>
+        <span class="src-count">{{ langchain_items|length }} posts</span>
+      </div>
+    </div>
+    {% for item in langchain_items %}
+    <div class="item">
+      <p class="item-title"><a href="{{ item.url }}">{{ item.title }}</a></p>
+      {% if item.abstract %}<div class="item-abstract">{{ item.abstract }}</div>{% endif %}
+      <div class="item-meta">
+        {% for tag in item.tags %}<span class="tag tag-comm">{{ tag }}</span>{% endfor %}
+        {% if item.published %}<span class="dot">·</span> {{ item.published }}{% endif %}
+      </div>
+      {{ deep_analysis_toggle(item) }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- ── Perplexity Blog ── -->
+  {% set perplexity_items = commercial_items|selectattr("source", "equalto", "Perplexity Blog")|list %}
+  {% if perplexity_items %}
+  <div class="source-section source-comm-perplexity">
+    <div class="src-bar"></div>
+    <div class="src-inner">
+      <div class="src-header-row">
+        <div class="src-left">
+          <span class="src-icon">🔍</span>
+          <div>
+            <div class="src-name">Perplexity Blog</div>
+            <div class="src-desc">Search · RAG</div>
+          </div>
+        </div>
+        <span class="src-count">{{ perplexity_items|length }} posts</span>
+      </div>
+    </div>
+    {% for item in perplexity_items %}
+    <div class="item">
+      <p class="item-title"><a href="{{ item.url }}">{{ item.title }}</a></p>
+      {% if item.abstract %}<div class="item-abstract">{{ item.abstract }}</div>{% endif %}
+      <div class="item-meta">
+        {% for tag in item.tags %}<span class="tag tag-comm">{{ tag }}</span>{% endfor %}
+        {% if item.published %}<span class="dot">·</span> {{ item.published }}{% endif %}
+      </div>
+      {{ deep_analysis_toggle(item) }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- ── Modal Blog ── -->
+  {% set modal_items = commercial_items|selectattr("source", "equalto", "Modal Blog")|list %}
+  {% if modal_items %}
+  <div class="source-section source-comm-modal">
+    <div class="src-bar"></div>
+    <div class="src-inner">
+      <div class="src-header-row">
+        <div class="src-left">
+          <span class="src-icon">⚙️</span>
+          <div>
+            <div class="src-name">Modal Blog</div>
+            <div class="src-desc">GPU Infra · Serverless</div>
+          </div>
+        </div>
+        <span class="src-count">{{ modal_items|length }} posts</span>
+      </div>
+    </div>
+    {% for item in modal_items %}
+    <div class="item">
+      <p class="item-title"><a href="{{ item.url }}">{{ item.title }}</a></p>
+      {% if item.abstract %}<div class="item-abstract">{{ item.abstract }}</div>{% endif %}
+      <div class="item-meta">
+        {% for tag in item.tags %}<span class="tag tag-comm">{{ tag }}</span>{% endfor %}
+        {% if item.published %}<span class="dot">·</span> {{ item.published }}{% endif %}
+      </div>
+      {{ deep_analysis_toggle(item) }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- ── YC Requests for Startups ── -->
+  {% set yc_items = commercial_items|selectattr("source", "equalto", "YC Requests for Startups")|list %}
+  {% if yc_items %}
+  <div class="source-section source-comm-yc">
+    <div class="src-bar"></div>
+    <div class="src-inner">
+      <div class="src-header-row">
+        <div class="src-left">
+          <span class="src-icon">🚀</span>
+          <div>
+            <div class="src-name">YC Requests for Startups</div>
+            <div class="src-desc">AI-native · Fintech · Industrial</div>
+          </div>
+        </div>
+        <span class="src-count">{{ yc_items|length }} posts</span>
+      </div>
+    </div>
+    {% for item in yc_items %}
+    <div class="item">
+      <p class="item-title"><a href="{{ item.url }}">{{ item.title }}</a></p>
+      {% if item.abstract %}<div class="item-abstract">{{ item.abstract }}</div>{% endif %}
+      <div class="item-meta">
+        {% for tag in item.tags %}<span class="tag tag-comm">{{ tag }}</span>{% endfor %}
+        {% if item.published %}<span class="dot">·</span> {{ item.published }}{% endif %}
+      </div>
+      {{ deep_analysis_toggle(item) }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- ── Stanford AI Index ── -->
+  {% set stanford_items = commercial_items|selectattr("source", "equalto", "Stanford AI Index")|list %}
+  {% if stanford_items %}
+  <div class="source-section source-comm-stanford">
+    <div class="src-bar"></div>
+    <div class="src-inner">
+      <div class="src-header-row">
+        <div class="src-left">
+          <span class="src-icon">🎓</span>
+          <div>
+            <div class="src-name">Stanford AI Index</div>
+            <div class="src-desc">Investment · Adoption · Policy</div>
+          </div>
+        </div>
+        <span class="src-count">{{ stanford_items|length }} reports</span>
+      </div>
+    </div>
+    {% for item in stanford_items %}
+    <div class="item">
+      <p class="item-title"><a href="{{ item.url }}">{{ item.title }}</a></p>
+      {% if item.abstract %}<div class="item-abstract">{{ item.abstract }}</div>{% endif %}
+      <div class="item-meta">
+        {% for tag in item.tags %}<span class="tag tag-comm">{{ tag }}</span>{% endfor %}
+        {% if item.published %}<span class="dot">·</span> {{ item.published }}{% endif %}
+      </div>
+      {{ deep_analysis_toggle(item) }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- ── Other Commercial Sources (catch-all) ── -->
+  {% set known_sources = ["OpenAI Blog", "Anthropic Blog", "Hugging Face Blog", "Together AI Blog", "Mistral Blog", "Cohere Blog", "Cursor Blog", "Replit Blog", "LangChain Blog", "Perplexity Blog", "Modal Blog", "YC Requests for Startups", "Stanford AI Index"] %}
+  {% set other_items = [] %}
+  {% for item in commercial_items %}
+    {% if item.source not in known_sources %}
+      {% if other_items.append(item) %}{% endif %}
+    {% endif %}
+  {% endfor %}
+  {% if other_items %}
+  <div class="source-section source-comm-default">
+    <div class="src-bar"></div>
+    <div class="src-inner">
+      <div class="src-header-row">
+        <div class="src-left">
+          <span class="src-icon">📰</span>
+          <div>
+            <div class="src-name">Other Sources</div>
+            <div class="src-desc">Additional AI Startup & Enterprise Blogs</div>
+          </div>
+        </div>
+        <span class="src-count">{{ other_items|length }} posts</span>
+      </div>
+    </div>
+    {% set ns_other = namespace(current_source='') %}
+    {% for item in other_items %}
+      {% if item.source != ns_other.current_source %}
+        {% set ns_other.current_source = item.source %}
+        <div class="topic-divider" style="padding-left: 22px;">
+          <div class="topic-dot" style="background: #e11d48;"></div>
+          <span class="topic-name" style="color: #e11d48;">{{ item.source }}</span>
+        </div>
+      {% endif %}
+      <div class="item">
+        <p class="item-title"><a href="{{ item.url }}">{{ item.title }}</a></p>
+        {% if item.abstract %}<div class="item-abstract">{{ item.abstract }}</div>{% endif %}
+        <div class="item-meta">
+          {% for tag in item.tags %}<span class="tag tag-comm">{{ tag }}</span>{% endfor %}
+          {% if item.published %}<span class="dot">·</span> {{ item.published }}{% endif %}
+        </div>
+        {{ deep_analysis_toggle(item) }}
+      </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% endif %}
+
+  <!-- ╔══ Footer ══╗ -->
+  <div class="footer">
+    PhD AI Trend Monitor v1.2 · Powered by Qwen<br>
+    <a href="https://github.com">Edit sources & settings →</a>
+  </div>
+
+</div>
+<script>
+function toggleAnalysis(btn) {
+  var div = btn.nextElementSibling;
+  if (div.style.display === 'none') {
+    div.style.display = 'block';
+    btn.classList.add('active');
+    btn.querySelector('.arrow').innerHTML = '&#9660;';
+  } else {
+    div.style.display = 'none';
+    btn.classList.remove('active');
+    btn.querySelector('.arrow').innerHTML = '&#9654;';
+  }
+}
+</script>
+</body>
+</html>

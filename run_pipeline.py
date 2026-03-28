@@ -18,6 +18,7 @@ from datetime import datetime
 # ── Fetchers ──
 from fetchers import arxiv_fetcher, hf_papers, github_trending, release_tracker, startup_blogs
 from summarizer import summarize
+from deep_analyzer import analyze_all
 from send_email import send
 
 
@@ -91,8 +92,18 @@ def run(fetch_only=False, local_only=False):
     print(f"\n[3/4] 🧠 Generating AI summary...")
     digest = summarize(research_items, commercial_items)
 
+    # ── Step 3.5: Deep Analysis ──
+    no_deep = "--no-deep-analysis" in sys.argv
+    if not no_deep:
+        print(f"\n[3.5/4] 🔍 Generating deep analysis for each item...")
+        r_items = digest.get("research_items", [])
+        c_items = digest.get("commercial_items", [])
+        analyze_all(r_items, c_items)
+    else:
+        print(f"\n[3.5/4] 🔍 Deep analysis skipped (--no-deep-analysis)")
+
     if local_only:
-        # Save HTML locally without sending
+        # Save interactive HTML locally (with deep analysis)
         from send_email import _save_local
         _save_local(digest)
         print("\n✅ Digest saved locally (--local mode)")

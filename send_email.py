@@ -45,11 +45,17 @@ def send(digest: dict):
         _save_local(digest)
 
 
-def _render(digest: dict) -> str:
-    """Render Jinja2 email template."""
+def _render(digest: dict, interactive: bool = False) -> str:
+    """Render Jinja2 email template.
+
+    Args:
+        digest: digest data dict
+        interactive: if True, use digest_interactive.html (with deep analysis toggles)
+    """
     template_dir = os.path.join(os.path.dirname(__file__), "templates")
     env = Environment(loader=FileSystemLoader(template_dir))
-    template = env.get_template("digest_email.html")
+    template_name = "digest_interactive.html" if interactive else "digest_email.html"
+    template = env.get_template(template_name)
 
     r_items = digest.get("research_items", [])
     c_items = digest.get("commercial_items", [])
@@ -68,9 +74,9 @@ def _render(digest: dict) -> str:
 
 
 def _save_local(digest: dict):
-    """Fallback: save rendered HTML locally."""
+    """Fallback: save rendered interactive HTML locally (with deep analysis toggles)."""
     os.makedirs("output", exist_ok=True)
-    html = _render(digest)
+    html = _render(digest, interactive=True)
     path = f"output/digest_{datetime.now().strftime('%Y%m%d')}.html"
     with open(path, "w") as f:
         f.write(html)
