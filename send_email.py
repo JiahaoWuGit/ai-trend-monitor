@@ -9,6 +9,10 @@ import resend
 def send(digest: dict):
     """Render the digest template and send via Resend.
 
+    Sends to all recipients in EMAIL_TO (comma-separated). As long as one
+    succeeds the pipeline is considered successful. If some fail, a follow-up
+    notification is sent to the successful recipients.
+
     Args:
         digest: dict with research_summary, commercial_summary, top_picks,
                 research_items, commercial_items
@@ -22,6 +26,9 @@ def send(digest: dict):
         _save_local(digest)
         return
 
+    # Support comma-separated recipients
+    recipients = [addr.strip() for addr in email_to.split(",") if addr.strip()]
+
     # Render HTML
     html = _render(digest, interactive=True)
 
@@ -32,17 +39,50 @@ def send(digest: dict):
     c_count = len(digest.get("commercial_items", []))
     subject = f"🔬 AI Digest {today} — {r_count + c_count} items | Research + Commercial"
 
-    try:
-        result = resend.Emails.send({
-            "from": email_from,
-            "to": [email_to],
-            "subject": subject,
-            "html": html,
-        })
-        print(f"  [Email] Sent to {email_to} — ID: {result.get('id', 'unknown')}")
-    except Exception as e:
-        print(f"  [Email] Send failed: {e}")
+    succeeded = []
+    failed = []
+
+    for addr in recipients:
+        try:
+            result = resend.Emails.send({
+                "from": email_from,
+                "to": [addr],
+                "subject": subject,
+                "html": html,
+            })
+            print(f"  [Email] Sent to {addr} — ID: {result.get('id', 'unknown')}")
+            succeeded.append(addr)
+        except Exception as e:
+            print(f"  [Email] Send to {addr} failed: {e}")
+            failed.append((addr, str(e)))
+
+    if not succeeded:
+        print("  [Email] All sends failed — saving local copy")
         _save_local(digest)
+        return
+
+    # If some failed, notify successful recipients
+    if failed:
+        failed_list = "\n".join(f"  - {addr}: {err}" for addr, err in failed)
+        print(f"  [Email] {len(failed)} recipient(s) failed, notifying {len(succeeded)} successful recipient(s)")
+        notify_html = (
+            f"<h3>⚠️ AI Digest 邮件发送部分失败</h3>"
+            f"<p>以下收件人的 AI Digest ({today}) 发送失败：</p><ul>"
+            + "".join(f"<li><b>{addr}</b>: {err}</li>" for addr, err in failed)
+            + "</ul><p>成功发送的收件人：</p><ul>"
+            + "".join(f"<li>{addr}</li>" for addr in succeeded)
+            + "</ul>"
+        )
+        try:
+            resend.Emails.send({
+                "from": email_from,
+                "to": succeeded,
+                "subject": f"⚠️ AI Digest {today} — 部分邮件发送失败通知",
+                "html": notify_html,
+            })
+            print(f"  [Email] Failure notification sent to {succeeded}")
+        except Exception as e:
+            print(f"  [Email] Failed to send failure notification: {e}")
 
 
 def _render(digest: dict, interactive: bool = False) -> str:
