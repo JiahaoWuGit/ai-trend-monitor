@@ -280,18 +280,20 @@
   .mega-divider-c h2 { color: #065f46; }
   .mega-divider .count { font-size: 11px; color: #94a3b8; font-weight: 600; }
 
-  /* === Deep Analysis === */
-  .toggle-btn {
+  /* === Deep Analysis (pure CSS, email-safe) === */
+  details.deep-toggle { margin-top: 8px; }
+  details.deep-toggle summary {
     display: inline-flex; align-items: center; gap: 4px;
-    margin-top: 8px; padding: 4px 12px; border-radius: 6px;
+    padding: 4px 12px; border-radius: 6px;
     font-size: 11px; font-weight: 600; cursor: pointer;
     background: #f0f9ff; border: 1px solid #bae6fd; color: #0369a1;
-    transition: all 0.15s ease;
+    list-style: none;
   }
-  .toggle-btn:hover { background: #e0f2fe; border-color: #7dd3fc; }
-  .toggle-btn.active { background: #dbeafe; border-color: #93c5fd; color: #1d4ed8; }
-  .toggle-btn .arrow { font-size: 9px; transition: transform 0.2s ease; }
-  .toggle-btn.active .arrow { transform: rotate(90deg); }
+  details.deep-toggle summary::-webkit-details-marker { display: none; }
+  details.deep-toggle summary::before { content: "▶ "; font-size: 9px; }
+  details.deep-toggle[open] summary::before { content: "▼ "; }
+  details.deep-toggle summary:hover { background: #e0f2fe; border-color: #7dd3fc; }
+  details.deep-toggle[open] summary { background: #dbeafe; border-color: #93c5fd; color: #1d4ed8; }
   .deep-analysis {
     margin: 10px 0 4px; padding: 14px 18px; border-radius: 8px;
     background: linear-gradient(135deg, #f0f9ff 0%, #eff6ff 100%);
@@ -312,8 +314,9 @@
 <body>
 {% macro deep_analysis_toggle(item) %}
 {% if item.deep_analysis is defined and item.deep_analysis %}
-<button class="toggle-btn" onclick="toggleAnalysis(this)"><span class="arrow">&#9654;</span> Deep Analysis</button>
-<div class="deep-analysis" style="display:none">{{ item.deep_analysis|safe }}</div>
+<details class="deep-toggle"><summary>Deep Analysis</summary>
+<div class="deep-analysis">{{ item.deep_analysis|safe }}</div>
+</details>
 {% endif %}
 {% endmacro %}
 <div class="container">
@@ -982,19 +985,5 @@
   </div>
 
 </div>
-<script>
-function toggleAnalysis(btn) {
-  var div = btn.nextElementSibling;
-  if (div.style.display === 'none') {
-    div.style.display = 'block';
-    btn.classList.add('active');
-    btn.querySelector('.arrow').innerHTML = '&#9660;';
-  } else {
-    div.style.display = 'none';
-    btn.classList.remove('active');
-    btn.querySelector('.arrow').innerHTML = '&#9654;';
-  }
-}
-</script>
 </body>
 </html>
