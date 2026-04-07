@@ -14,6 +14,7 @@ import sys
 import json
 import os
 from datetime import datetime
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # ── Fetchers ──
 from fetchers import arxiv_fetcher, hf_papers, github_trending, release_tracker, startup_blogs
@@ -39,22 +40,36 @@ def run(fetch_only=False, local_only=False):
     print(f"  AI Trend Monitor — {datetime.now().strftime('%Y-%m-%d %H:%M')}")
     print(f"{'='*60}\n")
 
-    # ── Step 1: Fetch ──
-    print("[1/4] 📡 Fetching data sources...\n")
+    # ── Step 1: Fetch (parallel) ──
+    print("[1/4] 📡 Fetching data sources (parallel)...\n")
 
     research_items = []
     commercial_items = []
 
-    # Research sources
-    print("  ── Research ──")
-    research_items.extend(arxiv_fetcher.fetch())
-    research_items.extend(hf_papers.fetch())
-    research_items.extend(github_trending.fetch())
-    research_items.extend(release_tracker.fetch())
+    fetcher_tasks = {
+        "arXiv": ("research", arxiv_fetcher.fetch),
+        "HF Papers": ("research", hf_papers.fetch),
+        "GitHub Trending": ("research", github_trending.fetch),
+        "Release Tracker": ("research", release_tracker.fetch),
+        "Startup Blogs": ("commercial", startup_blogs.fetch),
+    }
 
-    # Commercial sources
-    print("\n  ── Commercial ──")
-    commercial_items.extend(startup_blogs.fetch())
+    with ThreadPoolExecutor(max_workers=5) as executor:
+        futures = {
+            executor.submit(fn): (name, category)
+            for name, (category, fn) in fetcher_tasks.items()
+        }
+        for future in as_completed(futures):
+            name, category = futures[future]
+            try:
+                items = future.result()
+                if category == "research":
+                    research_items.extend(items)
+                else:
+                    commercial_items.extend(items)
+                print(f"  ✓ {name}: {len(items)} items")
+            except Exception as e:
+                print(f"  ✗ {name} failed: {e}")
 
     # ── Step 2: Dedup & Sort ──
     print(f"\n[2/4] 🧹 Deduplicating & sorting...")

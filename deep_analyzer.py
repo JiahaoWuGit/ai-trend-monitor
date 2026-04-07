@@ -3,6 +3,7 @@
 import os
 import json
 import re
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from openai import OpenAI
 
 # Reuse same config as summarizer.py
@@ -10,10 +11,11 @@ MODEL = "kimi-k2.5"
 MAX_TOKENS = 40000
 BASE_URL = "https://coding.dashscope.aliyuncs.com/v1"
 BATCH_SIZE = 5
+MAX_CONCURRENT_BATCHES = 3
 
 
 def analyze_all(research_items: list, commercial_items: list) -> tuple[list, list]:
-    """Generate deep analysis for all items in batches.
+    """Generate deep analysis for all items in batches (parallel).
 
     Adds a 'deep_analysis' field (HTML string) to each item dict.
     Returns (research_items, commercial_items) with analysis attached.
@@ -27,31 +29,43 @@ def analyze_all(research_items: list, commercial_items: list) -> tuple[list, lis
 
     client = OpenAI(api_key=api_key, base_url=BASE_URL)
 
-    print(f"  [DeepAnalyzer] Analyzing {len(research_items)} research + {len(commercial_items)} commercial items...")
+    print(f"  [DeepAnalyzer] Analyzing {len(research_items)} research + {len(commercial_items)} commercial items (parallel, max {MAX_CONCURRENT_BATCHES} concurrent)...")
 
-    _analyze_batch_list(client, research_items, "research")
-    _analyze_batch_list(client, commercial_items, "commercial")
+    _analyze_batch_list_parallel(client, research_items, "research")
+    _analyze_batch_list_parallel(client, commercial_items, "commercial")
 
     analyzed = sum(1 for i in research_items + commercial_items if i.get("deep_analysis"))
     print(f"  [DeepAnalyzer] Done — {analyzed}/{len(research_items) + len(commercial_items)} items analyzed")
     return research_items, commercial_items
 
 
-def _analyze_batch_list(client: OpenAI, items: list, category: str):
-    """Process items in batches of BATCH_SIZE."""
+def _analyze_batch_list_parallel(client: OpenAI, items: list, category: str):
+    """Process items in batches of BATCH_SIZE, running up to MAX_CONCURRENT_BATCHES in parallel."""
+    batches = []
     for i in range(0, len(items), BATCH_SIZE):
-        batch = items[i:i + BATCH_SIZE]
-        batch_num = i // BATCH_SIZE + 1
-        total_batches = (len(items) + BATCH_SIZE - 1) // BATCH_SIZE
-        print(f"    [{category}] Batch {batch_num}/{total_batches} ({len(batch)} items)")
-        try:
-            results = _analyze_batch(client, batch, category)
-            for item, analysis in zip(batch, results):
-                item["deep_analysis"] = analysis
-        except Exception as e:
-            print(f"    [{category}] Batch {batch_num} failed: {e}")
-            for item in batch:
-                item["deep_analysis"] = f"<p style='color:#94a3b8;'>分析生成失败: {e}</p>"
+        batches.append((i, items[i:i + BATCH_SIZE]))
+
+    total_batches = len(batches)
+    print(f"    [{category}] {total_batches} batches total, {MAX_CONCURRENT_BATCHES} concurrent")
+
+    with ThreadPoolExecutor(max_workers=MAX_CONCURRENT_BATCHES) as executor:
+        futures = {}
+        for start_idx, batch in batches:
+            batch_num = start_idx // BATCH_SIZE + 1
+            future = executor.submit(_analyze_batch, client, batch, category)
+            futures[future] = (start_idx, batch, batch_num)
+
+        for future in as_completed(futures):
+            start_idx, batch, batch_num = futures[future]
+            try:
+                results = future.result()
+                for item, analysis in zip(batch, results):
+                    item["deep_analysis"] = analysis
+                print(f"    [{category}] Batch {batch_num}/{total_batches} done")
+            except Exception as e:
+                print(f"    [{category}] Batch {batch_num}/{total_batches} failed: {e}")
+                for item in batch:
+                    item["deep_analysis"] = f"<p style='color:#94a3b8;'>分析生成失败: {e}</p>"
 
 
 def _analyze_batch(client: OpenAI, items: list, category: str) -> list[str]:

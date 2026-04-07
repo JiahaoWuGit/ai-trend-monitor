@@ -23,7 +23,7 @@ def send(digest: dict):
         return
 
     # Render HTML
-    html = _render(digest)
+    html = _render(digest, interactive=True)
 
     # Send
     resend.api_key = api_key
